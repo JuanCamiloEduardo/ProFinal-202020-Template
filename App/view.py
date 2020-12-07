@@ -31,6 +31,7 @@ from App import controller
 from DISClib.ADT import stack
 import timeit
 assert config
+from DISClib.ADT import list as lt
 
 """
 La vista se encarga de la interacción con el usuario.
@@ -51,3 +52,45 @@ operación seleccionada.
 """
 Menu principal
 """
+def printMenu():
+    print("\n")
+    print("*******************************************")
+    print("Bienvenido")
+    print("1- Inicializar Analizador")
+    print("2- Cargar información de buses de singapur")
+    print("3- Cantidad de clusters de Viajes ")
+    print("4- Ruta turística Circular ")
+    print("5- Estaciones críticas ")
+    print("6- Ruta turística por resistencia ")
+    print("7- Recomendador de Rutas  ")
+    print("8- Ruta de interés turístico   ")
+    print("9- Identificación de Estaciones para Publicidad ")  
+    print("10-  Identificación de Bicicletas para Mantenimiento ")  
+
+
+    print("0- Salir")
+    print("*******************************************")
+
+"-------------------------------------------------------------"
+def optionTwo():
+    print("\nCargando información de transporte de taxis ....")
+    controller.loadTrips(analyzer)
+"""
+Menu principal
+"""
+while True:
+    printMenu()
+    inputs = input('Seleccione una opción para continuar\n>')
+
+    if int(inputs[0]) == 1:
+        print("\nInicializando....")
+        # cont es el controlador que se usará de acá en adelante
+        analyzer = controller.init()
+
+    elif int(inputs[0]) == 2:
+        executiontime = timeit.timeit(optionTwo, number=1)
+        print("Tiempo de ejecución: " + str(executiontime))
+        print(lt.size(analyzer["lista"]))
+    else:
+        sys.exit(0)
+sys.exit(0)

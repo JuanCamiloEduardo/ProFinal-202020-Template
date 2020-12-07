@@ -27,6 +27,7 @@
 import config as cf
 from App import model
 import csv
+import os
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -39,13 +40,36 @@ recae sobre el controlador.
 # ___________________________________________________
 #  Inicializacion del catalogo
 # ___________________________________________________
+def init():
+    analyzer= model.newAnalyzer()
+    return analyzer
 
 
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos
 # ___________________________________________________
+def loadTrips(analyzer):
+    viajes=0
+    for filename in os.listdir(cf.data_dir):
+        
+        if filename.endswith('.csv'):
+            print('Cargando archivo: ' + filename)
+            viajes+=loadFile(analyzer, filename)
+    print("viajes totales: "+str(viajes))
+    return analyzer
 
+def loadFile(analyzer, tripfile):
+    """
+    """
+    tripfile = cf.data_dir + tripfile
+    input_file = csv.DictReader(open(tripfile, encoding="utf-8"),
+                                delimiter=",")
+    viajes=0
+    for trip in input_file:
+        viajes+=1
+        model.addtrip(analyzer,trip)
+    return viajes
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________

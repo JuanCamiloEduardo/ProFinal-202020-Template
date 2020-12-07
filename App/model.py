@@ -47,11 +47,33 @@ de creacion y consulta sobre las estructuras de datos.
 # ==============================
 # Funciones de consulta
 # ==============================
+def newAnalyzer():
+    """ Inicializa el analizador
 
+   stops: Tabla de hash para guardar los vertices del grafo
+   connections: Grafo para representar las rutas entre estaciones
+   components: Almacena la informacion de los componentes conectados
+   paths: Estructura que almancena los caminos de costo minimo desde un
+           vertice determinado a todos los otros vértices del grafo
+    """
+    analyzer = {
+               "lista":None,
+                }
+    analyzer["lista"]=lt.newList("ARRAY_LIST",compareid)
+    return analyzer
 # ==============================
 # Funciones Helper
 # ==============================
-
+def addtrip(analyzer,trip):
+    taxid=trip["taxi_id"]
+    if  lt.isPresent(analyzer["lista"],taxid)==0:
+        lt.addLast( analyzer["lista"],taxid)       
 # ==============================
 # Funciones de Comparacion
 # ==============================
+def compareid (tripA, tripB):
+    if (tripA) == (tripB):
+        return 0
+    elif (tripA) != (tripB):
+        return 1
+    return -1
