@@ -61,7 +61,9 @@ def printMenu():
     print("3- Reportegeneral ")
     print("4-  ")
     print("5- ")
-    print("6-  ")
+    print("6- s ")
+
+
     print("0- Salir")
     print("*******************************************")
 
