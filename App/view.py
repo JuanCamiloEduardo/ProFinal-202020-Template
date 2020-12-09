@@ -57,17 +57,11 @@ def printMenu():
     print("*******************************************")
     print("Bienvenido")
     print("1- Inicializar Analizador")
-    print("2- Cargar información de buses de singapur")
-    print("3- Cantidad de clusters de Viajes ")
-    print("4- Ruta turística Circular ")
-    print("5- Estaciones críticas ")
-    print("6- Ruta turística por resistencia ")
-    print("7- Recomendador de Rutas  ")
-    print("8- Ruta de interés turístico   ")
-    print("9- Identificación de Estaciones para Publicidad ")  
-    print("10-  Identificación de Bicicletas para Mantenimiento ")  
-
-
+    print("2- Cargar información de viajes de taxis")
+    print("3- Reportegeneral ")
+    print("4-  ")
+    print("5- ")
+    print("6-  ")
     print("0- Salir")
     print("*******************************************")
 
@@ -89,8 +83,24 @@ while True:
 
     elif int(inputs[0]) == 2:
         executiontime = timeit.timeit(optionTwo, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
-        print(lt.size(analyzer["lista"]))
+    elif int(inputs[0]) == 3:
+        parametrom=int(input("¿Cuantas companías que más servicios prestan desea conocer?"))
+        parametron=int(input("¿Cuantas companías que más taxis poseen desea conocer?"))
+        ntaxis,ncomapany,topm,topn=controller.reportegeneral(analyzer,parametrom,parametron)
+        print("El número de taxis es: "+str(ntaxis))
+        print("---------------------------------------------------------------")
+        print("El número de compañías es: "+str(ncomapany))
+        print("---------------------------------------------------------------")
+        print("las "+ str(parametrom)+" compañías que más servicios prestan son:")
+        print("     ")
+        for i in range(1,parametrom+1):
+            print(str(i)+".")
+            print(lt.getElement(topm,i)["value"])
+        print("---------------------------------------------------------------")
+        print("las "+ str(parametron)+" compañías que más taxis tienen son:")
+        print("     ")
+        for i in range(1,parametron+1):
+            print(str(i)+".")
+            print(lt.getElement(topn,i)["value"])
     else:
         sys.exit(0)
-sys.exit(0)

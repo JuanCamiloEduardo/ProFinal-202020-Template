@@ -27,6 +27,8 @@ import config
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
+from DISClib.DataStructures import mapentry as me
+from DISClib.Algorithms.Sorting import mergesort as mg
 from DISClib.DataStructures import listiterator as it
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
@@ -49,31 +51,106 @@ de creacion y consulta sobre las estructuras de datos.
 # ==============================
 def newAnalyzer():
     """ Inicializa el analizador
-
-   stops: Tabla de hash para guardar los vertices del grafo
-   connections: Grafo para representar las rutas entre estaciones
-   components: Almacena la informacion de los componentes conectados
-   paths: Estructura que almancena los caminos de costo minimo desde un
-           vertice determinado a todos los otros vértices del grafo
     """
     analyzer = {
                "lista":None,
+               "mapcompany":None,
+               "taxids":None,
                 }
-    analyzer["lista"]=lt.newList("ARRAY_LIST",compareid)
+    analyzer["lista"]=lt.newList("ARRAY_LIST")
+    analyzer["mapcompany"]=m.newMap(numelements=37,maptype="CHAINING",loadfactor=0.4,comparefunction=comparecompany)
+    analyzer["taxids"]=m.newMap(numelements=37,maptype="CHAINING",loadfactor=0.4,comparefunction=comparecompany)
     return analyzer
 # ==============================
 # Funciones Helper
 # ==============================
 def addtrip(analyzer,trip):
-    taxid=trip["taxi_id"]
-    if  lt.isPresent(analyzer["lista"],taxid)==0:
-        lt.addLast( analyzer["lista"],taxid)       
+    lt.addLast( analyzer["lista"],trip)       
 # ==============================
 # Funciones de Comparacion
 # ==============================
-def compareid (tripA, tripB):
-    if (tripA) == (tripB):
+def comparecompany(keyname,company):
+    """
+    Compara dos nombres de autor. El primero es una cadena
+    y el segundo un entry de un map
+    """
+    compentry = me.getKey(company)
+    if (keyname == compentry):
         return 0
-    elif (tripA) != (tripB):
+    elif (keyname > compentry):
         return 1
-    return -1
+    else:
+        return -1
+def greater_company(element1, element2):
+    if (element1["value"]["Cantidad de servicios: "]) > (element2["value"]["Cantidad de servicios: "]):
+        return True
+    return False
+def greater_company_taxis(element1, element2):
+    if (element1["value"]["taxis: "]) > (element2["value"]["taxis: "]):
+        return True
+# ==============================
+# Funciones requerimientos
+# ==============================ç
+def reportegeneral(analyzer,parametrom,parametron):
+    listaviajes= analyzer["lista"]
+    lista=[]
+    companias=[]
+    for i in range (lt.size(listaviajes)+1):
+        taxiid=lt.getElement(listaviajes,i)["taxi_id"]
+        compania=lt.getElement(listaviajes,i)["company"]
+        if compania=="":
+            compania="independent owner"
+        if compania not in companias:
+            companias.append(compania)
+        
+        if taxiid not in lista:
+            lista.append(taxiid)
+
+        addCompany(analyzer,compania,taxiid,lt.getElement(listaviajes,i))
+        addtaxid(analyzer,taxiid)
+    rankingm=lt.newList("ARRAY_LIST")
+    rankingn=lt.newList("ARRAY_LIST")
+    for i in companias:
+        compania=m.get(analyzer["mapcompany"],i)
+        lt.addLast(rankingm,compania)
+        lt.addLast(rankingn,compania)
+    mg.mergesort(rankingm,greater_company)
+    mg.mergesort(rankingn,greater_company_taxis)
+
+    rankingm=lt.subList(rankingm,1,parametrom+1)
+    rankingn=lt.subList(rankingn,1,parametron+1)
+    return len(lista),len(companias),rankingm,rankingn
+def addCompany(analyzer, company_name,taxiid,trip):
+    exist_company = m.contains( analyzer['mapcompany'],company_name)
+    if exist_company:
+        entry = m.get( analyzer['mapcompany'],company_name)
+        entry= me.getValue(entry)
+        entry["Cantidad de servicios: "]+=1
+        if not m.contains(analyzer["taxids"],taxiid):
+            entry["taxis: "]+=1
+            m.remove(analyzer["taxids"],taxiid)
+    else:
+        company = Newcompany(company_name)
+        m.put( analyzer['mapcompany'], company_name, company)
+        entry = m.get( analyzer['mapcompany'],company_name)
+        entry= me.getValue(entry)
+        if not m.contains(analyzer["taxids"],taxiid):
+            entry["taxis: "]+=1
+            m.remove(analyzer["taxids"],taxiid)
+       
+def Newcompany(name):
+    company = {'Compañía: ': "", "Cantidad de servicios: " : 0, "taxis: ":0}
+    company['Compañía: '] = name
+    company['Cantidad de servicios: '] = 1
+    company['taxis: '] = 0
+    return company
+
+def addtaxid(analyzer, taxi_id):
+    exist_taxi_id = m.contains( analyzer['taxids'],taxi_id)
+    if not exist_taxi_id:
+        taxiid = Newtaxi_id(taxi_id)
+        m.put( analyzer['taxids'], taxi_id, taxiid)
+def Newtaxi_id(taxi_id):
+    taxi = {'id: ':""}
+    taxi['id: '] = taxi_id
+    return taxi

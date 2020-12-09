@@ -73,3 +73,6 @@ def loadFile(analyzer, tripfile):
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
+def reportegeneral(analyzer,parametrom,parametron):
+    return model.reportegeneral(analyzer,parametrom,parametron)
+    
