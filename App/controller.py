@@ -50,13 +50,11 @@ def init():
 #  de datos en los modelos
 # ___________________________________________________
 def loadTrips(analyzer):
-    viajes=0
     for filename in os.listdir(cf.data_dir):
         
         if filename.endswith('.csv'):
             print('Cargando archivo: ' + filename)
-            viajes+=loadFile(analyzer, filename)
-    print("viajes totales: "+str(viajes))
+            loadFile(analyzer, filename)
     return analyzer
 
 def loadFile(analyzer, tripfile):
@@ -65,14 +63,14 @@ def loadFile(analyzer, tripfile):
     tripfile = cf.data_dir + tripfile
     input_file = csv.DictReader(open(tripfile, encoding="utf-8"),
                                 delimiter=",")
-    viajes=0
     for trip in input_file:
-        viajes+=1
         model.addtrip(analyzer,trip)
-    return viajes
+        model.addMap(analyzer,trip)
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
 def reportegeneral(analyzer,parametrom,parametron):
     return model.reportegeneral(analyzer,parametrom,parametron)
+def fechaRango(FechaI,FechaF,analyzer,FechaO):
+    return model.requerimientoB(analyzer,FechaI,FechaF,FechaO)
     

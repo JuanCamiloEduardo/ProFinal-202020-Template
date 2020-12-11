@@ -59,7 +59,7 @@ def printMenu():
     print("1- Inicializar Analizador")
     print("2- Cargar información de viajes de taxis")
     print("3- Reportegeneral ")
-    print("4-  ")
+    print("4- Top taxis (Dia,Rango) ")
     print("5- ")
     print("6- s ")
 
@@ -104,5 +104,39 @@ while True:
         for i in range(1,parametron+1):
             print(str(i)+".")
             print(lt.getElement(topn,i)["value"])
+    elif int(inputs[0]) == 4:
+        print("Digite la fecha especifica")
+        FechaO=input("Fecha Unica AAAA/MM/DD: ")
+        CantidadN=input("Cuantos taxis desea conocer: ")
+        print("Digite el Rango de una fecha")
+        FechaI=input("Fecha Inicial AAAA/MM/DD: ")
+        FechaF=input("Fecha Final AAAA/MM/DD: ")
+        CantidadM=input("Cuantos taxis desea conocer: ")
+        RespuestaFinal=controller.fechaRango(FechaI,FechaF,analyzer,FechaO)
+        print("El top taxis en una fecha especifica es:")
+        try:
+            if lt.getElement(RespuestaFinal,1)==False:
+                print("No hay taxis")
+            else:
+                ListaIndividuales=lt.getElement(RespuestaFinal,1)
+                for i in range(1,int(CantidadN)+1):
+                    top=lt.getElement(ListaIndividuales,i)
+                    r=top.find("_:")
+                    print(str(i)+"-"+top[0:r])
+        except:
+            print("Hubo un error")
+        print("El top taxis por un rango es:")
+        try:
+            if lt.getElement(RespuestaFinal,2)==False:
+                print("No hay taxis")
+            else:
+                ListaIndividuales=lt.getElement(RespuestaFinal,2)
+                for j in range(1,int(CantidadM)+1):
+                    top=lt.getElement(ListaIndividuales,j)
+                    r=top.find("_:")
+                    print(str(j)+"-"+top[0:r])
+        except:
+            print("Hubo un error")
+
     else:
         sys.exit(0)
