@@ -70,34 +70,29 @@ def newAnalyzer():
 def addtrip(analyzer,trip):
     lt.addLast( analyzer["lista"],trip)     
 
-def addMap(analyzer,trip):
-    llave=trip["trip_start_timestamp"]
-    llave=str(llave[0:10])
-    valor1=trip["taxi_id"]
-    if trip["trip_total"]=="":
-        valor2=0
-    else:
+def addMap(analyzer,trip):    
+    if trip["trip_total"]!="" and trip["trip_miles"]!="" and float(trip["trip_total"])>0 and float(trip["trip_miles"])>0 :
+        llave=trip["trip_start_timestamp"]
+        llave=str(llave[0:10])
+        valor1=trip["taxi_id"]
         valor2=float(trip["trip_total"])
-    if trip["trip_miles"]=="":
-        valor3=0
-    else:
         valor3=float(trip["trip_miles"])
-    Lista=lt.newList("ARRAY_LIST")
-    if op.contains(analyzer["MapaId"],llave[0:10])==True:
-        Valor=op.get(analyzer["MapaId"],llave[0:10])
-        Valor=Valor["value"]
-        Lista3=lt.newList("ARRAY_LIST")
-        lt.addFirst(Lista3,valor1)
-        lt.addLast(Lista3,valor2)
-        lt.addLast(Lista3,valor3)
-        lt.addLast(Valor,Lista3)
-    else:
-        Lista2=lt.newList("ARRAY_LIST")
-        lt.addFirst(Lista2,valor1)
-        lt.addLast(Lista2,valor2)
-        lt.addLast(Lista2,valor3)
-        lt.addFirst(Lista,Lista2)
-        op.put(analyzer["MapaId"],llave[0:10],Lista)
+        Lista=lt.newList("ARRAY_LIST")
+        if op.contains(analyzer["MapaId"],llave[0:10])==True:
+            Valor=op.get(analyzer["MapaId"],llave[0:10])
+            Valor=Valor["value"]
+            Lista3=lt.newList("ARRAY_LIST")
+            lt.addFirst(Lista3,valor1)
+            lt.addLast(Lista3,valor2)
+            lt.addLast(Lista3,valor3)
+            lt.addLast(Valor,Lista3)
+        else:
+            Lista2=lt.newList("ARRAY_LIST")
+            lt.addFirst(Lista2,valor1)
+            lt.addLast(Lista2,valor2)
+            lt.addLast(Lista2,valor3)
+            lt.addFirst(Lista,Lista2)
+            op.put(analyzer["MapaId"],llave[0:10],Lista)
 # ==============================
 # Funciones de Comparacion
 # ==============================
