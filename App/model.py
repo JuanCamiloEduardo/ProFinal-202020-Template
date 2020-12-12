@@ -26,8 +26,8 @@
 import config
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
-from DISClib.ADT import orderedmap as op
 from DISClib.ADT import list as lt
+from DISClib.ADT import orderedmap as op
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import mergesort as mg
 from DISClib.DataStructures import listiterator as it
@@ -57,18 +57,21 @@ def newAnalyzer():
                "lista":None,
                "mapcompany":None,
                "taxids":None,
-               "MapaId":None,
                 }
     analyzer["lista"]=lt.newList("ARRAY_LIST")
     analyzer["mapcompany"]=m.newMap(numelements=37,maptype="CHAINING",loadfactor=0.4,comparefunction=comparecompany)
     analyzer["MapaId"]=op.newMap(omaptype='RBT', comparefunction=compareDates)
     analyzer["taxids"]=m.newMap(numelements=37,maptype="CHAINING",loadfactor=0.4,comparefunction=comparecompany)
+    analyzer['grafo'] = gr.newGraph(datastructure='ADJ_LIST',
+                                          directed=True,
+                                          size=300,
+                                          comparefunction=comparecompany)
     return analyzer
 # ==============================
 # Funciones Helper
 # ==============================
 def addtrip(analyzer,trip):
-    lt.addLast( analyzer["lista"],trip)     
+    lt.addLast( analyzer["lista"],trip)
 
 def addMap(analyzer,trip):    
     if trip["trip_total"]!="" and trip["trip_miles"]!="" and float(trip["trip_total"])>0 and float(trip["trip_miles"])>0 :
@@ -92,7 +95,7 @@ def addMap(analyzer,trip):
             lt.addLast(Lista2,valor2)
             lt.addLast(Lista2,valor3)
             lt.addFirst(Lista,Lista2)
-            op.put(analyzer["MapaId"],llave[0:10],Lista)
+            op.put(analyzer["MapaId"],llave[0:10],Lista)       
 # ==============================
 # Funciones de Comparacion
 # ==============================
@@ -107,6 +110,7 @@ def compareDates(date1, date2):
         return 1
     else:
         return -1
+
 def comparecompany(keyname,company):
     """
     Compara dos nombres de autor. El primero es una cadena
@@ -126,6 +130,7 @@ def greater_company(element1, element2):
 def greater_company_taxis(element1, element2):
     if (element1["value"]["taxis: "]) > (element2["value"]["taxis: "]):
         return True
+
 def GreaterTaxis(element1, element2):
     Longitud1=len(element1)
     Longitud2=len(element2)
@@ -187,6 +192,7 @@ def addCompany(analyzer, company_name,taxiid,trip):
         if not m.contains(analyzer["taxids"],taxiid):
             entry["taxis: "]+=1
             m.remove(analyzer["taxids"],taxiid)
+
 def requerimientoB(analyzer,FechaI,FechaF,FechaO):
     ListaR=op.keys(analyzer["MapaId"],FechaI,FechaF)
     ListaU=op.keys(analyzer["MapaId"],FechaO,FechaO)
@@ -292,6 +298,7 @@ def Rango(ListaR,analyzer,especifica):
         Puntos=(ActualizacionMillas/ActualizacionPrecio)*ActualizacionViajes
         m.put(IdTaxis,Llave1,Puntos)
     return IdTaxis 
+
 def Newcompany(name):
     company = {'Compañía: ': "", "Cantidad de servicios: " : 0, "taxis: ":0}
     company['Compañía: '] = name
@@ -308,3 +315,82 @@ def Newtaxi_id(taxi_id):
     taxi = {'id: ':""}
     taxi['id: '] = taxi_id
     return taxi
+
+def addVertice(analyzer, Community_area):
+    """
+    Adiciona un viaje como un vertice del grafo
+    """
+    try:
+        if not gr.containsVertex(analyzer['grafo'], Community_area):
+            gr.insertVertex(analyzer['grafo'], Community_area)
+        return analyzer
+    except Exception as exp:
+        error.reraise(exp, 'model:addStation')
+
+def addArco(analyzer, origin, destination, duration):
+    """
+    Adiciona un arco entre dos estaciones
+    """
+    edge = gr.getEdge(analyzer['grafo'], origin, destination)
+    if edge is None:
+        gr.addEdge(analyzer['grafo'], origin, destination, duration)
+    else:
+        updateAverageWeight(edge,duration)
+    return analyzer
+
+def updateAverageWeight(edge,weight):
+    weight=int(weight)
+    newweight=(((int(edge["weight"]))*(int(edge["count"])) + (weight)) / (int(edge["count"]+1)))
+    edge["weight"]=int(newweight)
+    edge["count"]+=1
+
+def addgrafo(analyzer,trip,horainicio,horafinal,communityareainicio,communityareafinal):
+    """
+    """
+    try:
+        starttime=trip['trip_start_timestamp']
+        starttime=starttime[11:16]
+        starttimehora=int(starttime[0:2])
+        starttimeminutos=int(starttime[3:5])
+        endtime=trip['trip_end_timestamp']
+        endtime=endtime[11:16]
+        endtimehora=int(starttime[0:2])
+        endtimeminutos=int(starttime[3:5])
+        horainiciohora=horainicio[0:2]
+        horainiciominutos=horainicio[3:5]
+        horafinalhora=horafinal[0:2]
+        horafinalminutos=horafinal[3:5]
+        starttimeHHMM=int(str(starttimehora)+str(starttimeminutos))
+        endtimeHHMM=int(str(endtimehora)+str(endtimeminutos))
+        horainicioHHMM=int(str(horainiciohora)+str(horainiciominutos))
+        horafinalHHMM=int(str(horafinalhora)+str(horafinalminutos))
+        startarea=trip['pickup_community_area']
+        endarea=trip['dropoff_community_area']
+        communityareainicio=float(communityareainicio)
+        communityareafinal=float(communityareafinal)
+        if startarea!="" and endarea!="":
+            startarea=float(startarea)
+            endarea=float(endarea)
+        if trip['trip_seconds']!="" and communityareainicio==startarea and communityareafinal==endarea and startarea!="" and endarea!="":
+            if horainicioHHMM<=starttimeHHMM and horafinalHHMM>=starttimeHHMM:
+                duration = float(trip['trip_seconds'])
+                addVertice(analyzer, starttime)
+                addVertice(analyzer, endtime)
+                addArco(analyzer, starttime, endtime, duration)
+    except Exception as exp:
+        error.reraise(exp, 'model:addTrip')
+
+def requerimiento3a(analyzer):
+    menor=float('inf')
+    arcoretorno=""
+    listaarcos=gr.edges(analyzer["grafo"])
+    for i in range(1,lt.size(listaarcos)+1):
+        arco=lt.getElement(listaarcos,i)
+        if arco["weight"]<menor:
+            menor=arco["weight"]
+            arcoretorno=arco
+    analyzer['grafo'] = gr.newGraph(datastructure='ADJ_LIST',
+                                          directed=True,
+                                          size=300,
+                                          comparefunction=comparecompany)
+    return arcoretorno

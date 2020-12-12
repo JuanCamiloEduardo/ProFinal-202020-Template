@@ -50,11 +50,13 @@ def init():
 #  de datos en los modelos
 # ___________________________________________________
 def loadTrips(analyzer):
+    viajes=0
     for filename in os.listdir(cf.data_dir):
         
         if filename.endswith('.csv'):
             print('Cargando archivo: ' + filename)
-            loadFile(analyzer, filename)
+            viajes+=loadFile(analyzer, filename)
+    print("viajes totales: "+str(viajes))
     return analyzer
 
 def loadFile(analyzer, tripfile):
@@ -63,14 +65,59 @@ def loadFile(analyzer, tripfile):
     tripfile = cf.data_dir + tripfile
     input_file = csv.DictReader(open(tripfile, encoding="utf-8"),
                                 delimiter=",")
+    viajes=0
     for trip in input_file:
+        viajes+=1
         model.addtrip(analyzer,trip)
         model.addMap(analyzer,trip)
+
+    return viajes
+
+def loadTripsGrafo(analyzer,horainicio,horafinal,communityareainicio,communityareafinal):
+    viajes=0
+    for filename in os.listdir(cf.data_dir):
+        
+        if filename.endswith('.csv'):
+            print('Cargando archivo: ' + filename)
+            viajes+=loadFileGrafo(analyzer,filename,horainicio,horafinal,communityareainicio,communityareafinal)
+    print("viajes totales: "+str(viajes))
+    return analyzer
+
+def loadFileGrafo(analyzer,tripfile,horainicio,horafinal,communityareainicio,communityareafinal):
+    """
+    """
+    tripfile = cf.data_dir + tripfile
+    input_file = csv.DictReader(open(tripfile, encoding="utf-8"),
+                                delimiter=",")
+    viajes=0
+    for trip in input_file:
+        viajes+=1
+        model.addgrafo(analyzer,trip,horainicio,horafinal,communityareainicio,communityareafinal)
+
+    return viajes
+
+def loadTripsDay(analyzer,Dia,Id):
+    for filename in os.listdir(cf.data_dir):
+        if filename.endswith('.csv'):
+            loadFileDia(analyzer,filename,Dia,Id)
+    return analyzer
+def loadFileDia(analyzer,tripfile,Dia,Id):
+    """
+    """
+    tripfile = cf.data_dir + tripfile
+    input_file = csv.DictReader(open(tripfile, encoding="utf-8"),
+                                delimiter=",")
+    for trip in input_file:
+        model.addTripDia(analyzer,trip,Dia,Id)
+
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
 def reportegeneral(analyzer,parametrom,parametron):
     return model.reportegeneral(analyzer,parametrom,parametron)
+    
 def fechaRango(FechaI,FechaF,analyzer,FechaO):
     return model.requerimientoB(analyzer,FechaI,FechaF,FechaO)
-    
+
+def requerimiento3a(analyzer):
+    return model.requerimiento3a(analyzer)

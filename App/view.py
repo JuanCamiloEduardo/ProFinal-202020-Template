@@ -58,10 +58,9 @@ def printMenu():
     print("Bienvenido")
     print("1- Inicializar Analizador")
     print("2- Cargar información de viajes de taxis")
-    print("3- Reportegeneral ")
-    print("4- Top taxis (Dia,Rango) ")
-    print("5- ")
-    print("6- s ")
+    print("3- Reporte general ")
+    print("4- Sistema de puntos  basado en una función alfa diaria")
+    print("5- Proponer el mejor horario")
 
 
     print("0- Salir")
@@ -104,13 +103,14 @@ while True:
         for i in range(1,parametron+1):
             print(str(i)+".")
             print(lt.getElement(topn,i)["value"])
+
     elif int(inputs[0]) == 4:
         print("Digite la fecha especifica")
-        FechaO=input("Fecha Unica AAAA/MM/DD: ")
+        FechaO=input("Fecha Unica AAAA-MM-DD: ")
         CantidadN=input("Cuantos taxis desea conocer: ")
         print("Digite el Rango de una fecha")
-        FechaI=input("Fecha Inicial AAAA/MM/DD: ")
-        FechaF=input("Fecha Final AAAA/MM/DD: ")
+        FechaI=input("Fecha Inicial AAAA-MM-DD: ")
+        FechaF=input("Fecha Final AAAA-MM-DD: ")
         CantidadM=input("Cuantos taxis desea conocer: ")
         RespuestaFinal=controller.fechaRango(FechaI,FechaF,analyzer,FechaO)
         print("El top taxis en una fecha especifica es:")
@@ -137,6 +137,25 @@ while True:
                     print(str(j)+"-"+top[0:r])
         except:
             print("Hubo un error")
+
+    elif int(inputs[0]) == 5:
+        try:
+            horainicio=input("Digite la hora inicial (HH:MM): ")
+            horafinal=input("Digite la hora final (HH:MM): ")
+            communityareainicio=input("Digite la zona inicial: ")
+            communityareafinal=input("Digite la zona final: ")
+            controller.loadTripsGrafo(analyzer,horainicio,horafinal,communityareainicio,communityareafinal)
+            arcoretorno=controller.requerimiento3a(analyzer)
+            print("-------------------------------")
+            print("Hora inicial del recorrido mas corto: "+str(arcoretorno['vertexA']))
+            print("-------------------------------")
+            print("Hora final del recorrido mas corto: "+str(arcoretorno['vertexB']))
+            print("-------------------------------")
+            print("Camino: "+str(communityareainicio)+" -> "+str(communityareafinal))
+            print("duracion en segundos: "+str(arcoretorno['weight']))
+            print("-------------------------------")
+        except:
+            print("Ocurrio un error")
 
     else:
         sys.exit(0)
