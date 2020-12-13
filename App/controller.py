@@ -92,7 +92,7 @@ def loadFileGrafo(analyzer,tripfile,horainicio,horafinal,communityareainicio,com
     viajes=0
     for trip in input_file:
         viajes+=1
-        model.addgrafo(analyzer,trip,horainicio,horafinal,communityareainicio,communityareafinal)
+        model.addareas(analyzer,trip,horainicio,horafinal,communityareainicio,communityareafinal)
 
     return viajes
 
@@ -119,5 +119,5 @@ def reportegeneral(analyzer,parametrom,parametron):
 def fechaRango(FechaI,FechaF,analyzer,FechaO):
     return model.requerimientoB(analyzer,FechaI,FechaF,FechaO)
 
-def requerimiento3a(analyzer):
-    return model.requerimiento3a(analyzer)
+def requerimiento3(analyzer,horainicio,horafinal,communityareainicio,communityareafinal):
+    return model.requerimiento3(analyzer,horainicio,horafinal,communityareainicio,communityareafinal)

@@ -34,6 +34,7 @@ from DISClib.DataStructures import listiterator as it
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
+from DISClib.ADT import stack as stack
 assert config
 
 """
@@ -344,53 +345,86 @@ def updateAverageWeight(edge,weight):
     edge["weight"]=int(newweight)
     edge["count"]+=1
 
-def addgrafo(analyzer,trip,horainicio,horafinal,communityareainicio,communityareafinal):
-    """
-    """
-    try:
-        starttime=trip['trip_start_timestamp']
-        starttime=starttime[11:16]
-        starttimehora=int(starttime[0:2])
-        starttimeminutos=int(starttime[3:5])
-        endtime=trip['trip_end_timestamp']
-        endtime=endtime[11:16]
-        endtimehora=int(starttime[0:2])
-        endtimeminutos=int(starttime[3:5])
-        horainiciohora=horainicio[0:2]
-        horainiciominutos=horainicio[3:5]
-        horafinalhora=horafinal[0:2]
-        horafinalminutos=horafinal[3:5]
-        starttimeHHMM=int(str(starttimehora)+str(starttimeminutos))
-        endtimeHHMM=int(str(endtimehora)+str(endtimeminutos))
-        horainicioHHMM=int(str(horainiciohora)+str(horainiciominutos))
-        horafinalHHMM=int(str(horafinalhora)+str(horafinalminutos))
-        startarea=trip['pickup_community_area']
-        endarea=trip['dropoff_community_area']
-        communityareainicio=float(communityareainicio)
-        communityareafinal=float(communityareafinal)
-        if startarea!="" and endarea!="":
-            startarea=float(startarea)
-            endarea=float(endarea)
-        if trip['trip_seconds']!="" and communityareainicio==startarea and communityareafinal==endarea and startarea!="" and endarea!="":
-            if horainicioHHMM<=starttimeHHMM and horafinalHHMM>=starttimeHHMM:
-                duration = float(trip['trip_seconds'])
-                addVertice(analyzer, starttime)
-                addVertice(analyzer, endtime)
-                addArco(analyzer, starttime, endtime, duration)
-    except Exception as exp:
-        error.reraise(exp, 'model:addTrip')
+def addareas(analyzer,trip,horainicio,horafinal,communityareainicio,communityareafinal):
+    starttime=trip['trip_start_timestamp']
+    starttime=starttime[11:16]
+    starttimehora=int(starttime[0:2])
+    starttimeminutos=int(starttime[3:5])
+    endtime=trip['trip_end_timestamp']
+    endtime=endtime[11:16]
+    endtimehora=int(starttime[0:2])
+    endtimeminutos=int(starttime[3:5])
+    horainiciohora=horainicio[0:2]
+    horainiciominutos=horainicio[3:5]
+    horafinalhora=horafinal[0:2]
+    horafinalminutos=horafinal[3:5]
+    starttimeHHMM=int(str(starttimehora)+str(starttimeminutos))
+    endtimeHHMM=int(str(endtimehora)+str(endtimeminutos))
+    horainicioHHMM=int(str(horainiciohora)+str(horainiciominutos))
+    horafinalHHMM=int(str(horafinalhora)+str(horafinalminutos))
+    startarea=trip['pickup_community_area']
+    endarea=trip['dropoff_community_area']
+    communityareainicio=float(communityareainicio)
+    communityareafinal=float(communityareafinal)
+    if startarea!="" and endarea!="":
+        startarea=float(startarea)
+        endarea=float(endarea)
+    if startarea==communityareainicio:
+        if trip['trip_seconds']!="" and horainicioHHMM<=starttimeHHMM and horafinalHHMM>=starttimeHHMM and startarea!="" and endarea!="":
+            origin=str(startarea)+"-"+str(starttime)
+            destination=str(endarea)+"-"+str(endtime)
+            duration = float(trip['trip_seconds'])     
+            addVertice(analyzer, origin)
+            addVertice(analyzer, destination)
+            addArco(analyzer, origin, destination, duration)
+    elif startarea!=communityareainicio:
+        if trip['trip_seconds']!="" and horainicioHHMM<=starttimeHHMM and startarea!="" and endarea!="":
+            origin=str(startarea)+"-"+str(starttime)
+            destination=str(endarea)+"-"+str(endtime)
+            duration = float(trip['trip_seconds'])     
+            addVertice(analyzer, origin)
+            addVertice(analyzer, destination)
+            addArco(analyzer, origin, destination, duration)
 
-def requerimiento3a(analyzer):
-    menor=float('inf')
-    arcoretorno=""
-    listaarcos=gr.edges(analyzer["grafo"])
-    for i in range(1,lt.size(listaarcos)+1):
-        arco=lt.getElement(listaarcos,i)
-        if arco["weight"]<menor:
-            menor=arco["weight"]
-            arcoretorno=arco
+def requerimiento3(analyzer,horainicio,horafinal,communityareainicio,communityareafinal):
+    listavertices=gr.vertices(analyzer["grafo"])
+    listainiciales=lt.newList("ARRAY_LIST")
+    listafinales=lt.newList("ARRAY_LIST")
+    distToMenor=float('inf')
+    verticeinicialmenor=""
+    verticefinalmenor=""
+    for i in range(1,lt.size(listavertices)+1):
+        vertex=lt.getElement(listavertices,i)
+        vertexlista=vertex.split("-")
+        vertice=float(vertexlista[0])
+        if vertice==communityareainicio:
+            lt.addLast(listainiciales,vertex)
+        elif vertice==communityareafinal:
+            lt.addLast(listafinales,vertex)
+
+    for i in range(1,lt.size(listainiciales)+1):
+        verticeinicial=lt.getElement(listainiciales,i)
+        daistra=djk.Dijkstra(analyzer["grafo"],verticeinicial)
+        for j in range(1,lt.size(listafinales)+1):
+            verticefinal=lt.getElement(listafinales,j)
+            if djk.hasPathTo(daistra,verticefinal):
+                distancia=djk.distTo(daistra,verticefinal)
+                if distancia<distToMenor:
+                    distToMenor=distancia
+                    verticeinicialmenor=verticeinicial
+                    verticefinalmenor=verticefinal
+    
+    daistra=djk.Dijkstra(analyzer["grafo"],verticeinicialmenor)
+    rutapila=djk.pathTo(daistra,verticefinalmenor)
+    ruta=lt.newList("ARRAY_LIST")
+    for j in range(1,stack.size(rutapila)+1):
+        k=stack.pop(rutapila)
+        lt.addLast(ruta,k)
+    retorno=lt.newList("ARRAY_LIST")
+    lt.addLast(retorno,distToMenor)
+    lt.addLast(retorno,ruta)
     analyzer['grafo'] = gr.newGraph(datastructure='ADJ_LIST',
                                           directed=True,
                                           size=300,
                                           comparefunction=comparecompany)
-    return arcoretorno
+    return retorno

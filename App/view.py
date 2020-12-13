@@ -32,6 +32,7 @@ from DISClib.ADT import stack
 import timeit
 assert config
 from DISClib.ADT import list as lt
+from DISClib.ADT.graph import gr
 
 """
 La vista se encarga de la interacción con el usuario.
@@ -142,20 +143,19 @@ while True:
         try:
             horainicio=input("Digite la hora inicial (HH:MM): ")
             horafinal=input("Digite la hora final (HH:MM): ")
-            communityareainicio=input("Digite la zona inicial: ")
-            communityareafinal=input("Digite la zona final: ")
+            communityareainicio=float(input("Digite la zona inicial: "))
+            communityareafinal=float(input("Digite la zona final: "))
             controller.loadTripsGrafo(analyzer,horainicio,horafinal,communityareainicio,communityareafinal)
-            arcoretorno=controller.requerimiento3a(analyzer)
+            print("Calculando, espere un momento...")
+            retorno=controller.requerimiento3(analyzer,horainicio,horafinal,communityareainicio,communityareafinal)
+            ruta=lt.getElement(retorno,2)
             print("-------------------------------")
-            print("Hora inicial del recorrido mas corto: "+str(arcoretorno['vertexA']))
+            print("la ruta de viaje mas rapida entre estas 2 areas es:")
+            for i in range(1,lt.size(ruta)+1):
+                print(lt.getElement(ruta,i))
             print("-------------------------------")
-            print("Hora final del recorrido mas corto: "+str(arcoretorno['vertexB']))
-            print("-------------------------------")
-            print("Camino: "+str(communityareainicio)+" -> "+str(communityareafinal))
-            print("duracion en segundos: "+str(arcoretorno['weight']))
-            print("-------------------------------")
+            print("La menor duracion de viaje entre estas 2 areas en segundos es de: "+str(int(lt.getElement(retorno,1))))
         except:
-            print("Ocurrio un error")
-
+            print("Hubo un error")
     else:
         sys.exit(0)
