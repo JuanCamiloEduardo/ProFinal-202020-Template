@@ -113,11 +113,3 @@ def loadFileDia(analyzer,tripfile,Dia,Id):
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
-def reportegeneral(analyzer,parametrom,parametron):
-    return model.reportegeneral(analyzer,parametrom,parametron)
-    
-def fechaRango(FechaI,FechaF,analyzer,FechaO):
-    return model.requerimientoB(analyzer,FechaI,FechaF,FechaO)
-
-def requerimiento3(analyzer,horainicio,horafinal,communityareainicio,communityareafinal):
-    return model.requerimiento3(analyzer,horainicio,horafinal,communityareainicio,communityareafinal)
